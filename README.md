@@ -1,25 +1,23 @@
-Postcode.nl API REST Client
-=============
+# Postcode.nl API REST Client
 
 A ASP.NET 4.5.1+ class, which offers methods to directly talk with the [Postcode.nl API](https://api.postcode.nl/documentation) through the REST endpoint offered.
 You will need to create an account with the [Postcode.nl API](https://api.postcode.nl) service.
 
 Implements both the [Address service](https://services.postcode.nl/adres-api/adres-validatie) and the [Signal service](https://services.postcode.nl/adres-api/signaal).
 
-License
-=============
+## License
 
 All source code is licensed under the [GNU Lesser General Public License](http://www.gnu.org/licenses/lgpl.html)
 
-Installation
-=============
+## Installation
 
-The best way to install is by using [PHP Composer](https://getcomposer.org/), get package [`postcode-nl/api-restclient`](https://packagist.org/packages/postcode-nl/api-restclient) and stay up to date easily.
+The easiest way to get started with Postcode.nl API REST Client is to use the NuGet package
+
+	Install-Package PostcodeNlApi
 
 Or download the source from my GitHub page: https://github.com/janssenr/PostcodeNlApiRestClient
 
-Usage Address API
-=============
+## Usage Address API
 
 Include the class in your ASP.Net project, instantiate the ASP.Net class with your authentication details and call the 'lookupAddress' method.
 You can handle errors by catching the defined Exception classes.
@@ -27,8 +25,12 @@ You can handle errors by catching the defined Exception classes.
 * See [Address API description](https://services.postcode.nl/adres-api/adres-validatie) for more information
 * See [Address API method documentation](https://api.postcode.nl/documentation/address-api) for the possible fields
 
-Usage Signal API
-=============
+```
+var api = new PostcodeNlApiRestClient(apiKey: "<your key>", apiSecret: "<your secret>");
+var result = api.LookupAddress("2012ES", "30");
+```
+
+## Usage Signal API
 
 Include the class in your ASP.Net project, instantiate the ASP.Net class with your authentication details and call the 'doSignalCheck' method.
 You can handle errors by catching the defined Exception classes.
