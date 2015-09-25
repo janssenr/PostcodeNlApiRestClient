@@ -39,15 +39,15 @@ You can handle errors by catching the defined Exception classes.
 * See [Signal API check method documentation](https://api.postcode.nl/documentation/signal-api) for the possible fields to pass.
 * See [basic example](https://api.postcode.nl/documentation/signal-api-example) for a practical example
 
+
+```
+var api = new PostcodeNlApiRestClient(apiKey: "<your key>", apiSecret: "<your secret>");
 var address = new PostcodeNlSignalAddress
 {
 	Postcode = "2012ES",
 	HouseNumber = 30,
 	Country = "NL"
 };
-
-```
-var api = new PostcodeNlApiRestClient(apiKey: "<your key>", apiSecret: "<your secret>");
 var request = new PostcodeNlSignalRequest
 {
 	Customer = new PostcodeNlSignalCustomer
