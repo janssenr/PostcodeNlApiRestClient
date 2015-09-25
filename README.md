@@ -19,7 +19,7 @@ Or download the source from my GitHub page: https://github.com/janssenr/Postcode
 
 ## Usage Address API
 
-Include the class in your ASP.Net project, instantiate the ASP.Net class with your authentication details and call the 'lookupAddress' method.
+Include the class in your ASP.Net project, instantiate the ASP.Net class with your authentication details and call the 'LookupAddress' method.
 You can handle errors by catching the defined Exception classes.
 
 * See [Address API description](https://services.postcode.nl/adres-api/adres-validatie) for more information
@@ -32,7 +32,7 @@ var result = api.LookupAddress("2012ES", "30");
 
 ## Usage Signal API
 
-Include the class in your ASP.Net project, instantiate the ASP.Net class with your authentication details and call the 'doSignalCheck' method.
+Include the class in your ASP.Net project, instantiate the ASP.Net class with your authentication details and call the 'DoSignalCheck' method.
 You can handle errors by catching the defined Exception classes.
 
 * See [Signal API description](https://services.postcode.nl/adres-api/signaal) for more information
