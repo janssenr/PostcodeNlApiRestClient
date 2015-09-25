@@ -16,7 +16,7 @@ Installation
 
 The best way to install is by using [PHP Composer](https://getcomposer.org/), get package [`postcode-nl/api-restclient`](https://packagist.org/packages/postcode-nl/api-restclient) and stay up to date easily.
 
-Or download the source from our GitHub page: https://github.com/postcode-nl/PostcodeNl_Api_RestClient
+Or download the source from my GitHub page: https://github.com/janssenr/PostcodeNlApiRestClient
 
 Usage Address API
 =============
@@ -24,8 +24,8 @@ Usage Address API
 Include the class in your ASP.Net project, instantiate the ASP.Net class with your authentication details and call the 'lookupAddress' method.
 You can handle errors by catching the defined Exception classes.
 
-* See our [Address API description](https://api.postcode.nl/documentation/address-api-description) for more information
-* See our [Address API method documentation](https://api.postcode.nl/documentation/rest-json-endpoint#address-api) for the possible fields
+* See [Address API description](https://api.postcode.nl/documentation/address-api-description) for more information
+* See [Address API method documentation](https://api.postcode.nl/documentation/rest-json-endpoint#address-api) for the possible fields
 
 Usage Signal API
 =============
@@ -33,6 +33,6 @@ Usage Signal API
 Include the class in your ASP.Net project, instantiate the ASP.Net class with your authentication details and call the 'doSignalCheck' method.
 You can handle errors by catching the defined Exception classes.
 
-* See our [Signal API description](https://api.postcode.nl/documentation/signal-api-description) for more information
-* See our [Signal API check method documentation](https://api.postcode.nl/documentation/rest-json-endpoint#signal-api) for the possible fields to pass.
-* See our [basic example](https://api.postcode.nl/documentation/signal-api-example) for a practical example
+* See [Signal API description](https://api.postcode.nl/documentation/signal-api-description) for more information
+* See [Signal API check method documentation](https://api.postcode.nl/documentation/rest-json-endpoint#signal-api) for the possible fields to pass.
+* See [basic example](https://api.postcode.nl/documentation/signal-api-example) for a practical example
