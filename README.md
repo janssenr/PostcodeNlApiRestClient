@@ -1,6 +1,6 @@
 # Postcode.nl API REST Client
 
-A ASP.NET 4.5.1+ class, which offers methods to directly talk with the [Postcode.nl API](https://api.postcode.nl/documentation) through the REST endpoint offered.
+A ASP.Net 4.5.1+ class, which offers methods to directly talk with the [Postcode.nl API](https://api.postcode.nl/documentation) through the REST endpoint offered.
 You will need to create an account with the [Postcode.nl API](https://api.postcode.nl) service.
 
 Implements both the [Address service](https://services.postcode.nl/adres-api/adres-validatie) and the [Signal service](https://services.postcode.nl/adres-api/signaal).
