@@ -38,3 +38,34 @@ You can handle errors by catching the defined Exception classes.
 * See [Signal API description](https://services.postcode.nl/adres-api/signaal) for more information
 * See [Signal API check method documentation](https://api.postcode.nl/documentation/signal-api) for the possible fields to pass.
 * See [basic example](https://api.postcode.nl/documentation/signal-api-example) for a practical example
+
+var address = new PostcodeNlSignalAddress
+{
+	Postcode = "2012ES",
+	HouseNumber = 30,
+	Country = "NL"
+};
+
+```
+var api = new PostcodeNlApiRestClient(apiKey: "<your key>", apiSecret: "<your secret>");
+var request = new PostcodeNlSignalRequest
+{
+	Customer = new PostcodeNlSignalCustomer
+	{
+		Email = "test-address@postcode.nl",
+		PhoneNumber = "+31235325689",
+		Address = address
+	},
+	Access = new PostcodeNlSignalAccess
+	{
+		IpAddress = "123.123.123.123"
+	},
+	Transaction = new PostcodeNlSignalTransaction
+	{
+		Status = "new-checkout",
+		InternalId = "534729",
+		DeliveryAddress = address
+	}
+};
+var result = api.DoSignalCheck(request);
+```
