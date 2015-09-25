@@ -9,7 +9,7 @@ Implements both the [Address service](https://api.postcode.nl/documentation/addr
 License
 =============
 
-The code is available under the open source Simplified BSD license. (see LICENSE.txt)
+All source code is licensed under the [GNU Lesser General Public License](http://www.gnu.org/licenses/lgpl.html)
 
 Installation
 =============
