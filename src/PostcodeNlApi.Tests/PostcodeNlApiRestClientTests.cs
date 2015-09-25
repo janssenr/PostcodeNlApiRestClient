@@ -1,5 +1,6 @@
 ﻿using System.Configuration;
 using NUnit.Framework;
+using PostcodeNlApi.Signal;
 
 namespace PostcodeNlApi.Tests
 {
@@ -42,6 +43,40 @@ namespace PostcodeNlApi.Tests
         public void NonExistingPostcode()
         {
             _postcodeNlApiRestClient.LookupAddress("1234ZZ", "1234", "", true);
+        }
+
+        [Test]
+        public void SignalTest()
+        {
+            var address = new PostcodeNlSignalAddress
+            {
+                Postcode = "2012ES",
+                HouseNumber = 30,
+                Country = "NL"
+            };
+
+            var request = new PostcodeNlSignalRequest
+            {
+                Customer = new PostcodeNlSignalCustomer
+                {
+                    Email = "test-address@postcode.nl",
+                    PhoneNumber = "+31235325689",
+                    Address = address
+                },
+                Access = new PostcodeNlSignalAccess
+                {
+                    IpAddress = "123.123.123.123"
+                },
+                Transaction = new PostcodeNlSignalTransaction
+                {
+                    Status = "new-checkout",
+                    InternalId = "534729",
+                    DeliveryAddress = address
+                }
+            };
+            var result = _postcodeNlApiRestClient.DoSignalCheck(request);
+            Assert.AreEqual(4, result.Signals.Count);
+            Assert.AreEqual(0, result.WarningCount);
         }
     }
 }
