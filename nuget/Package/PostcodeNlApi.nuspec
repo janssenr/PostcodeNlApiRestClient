@@ -1,13 +1,15 @@
 <?xml version="1.0"?>
 <package xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <metadata xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
-    <id>PostcodeNlApi</id>
+    <id>PostcodeNlApiRestClient</id>
     <version>1.0.0</version>
     <authors>Rob Janssen</authors>
     <owners>Rob Janssen</owners>
+    <licenseUrl>https://github.com/janssenr/PostcodeNlApiRestClient</licenseUrl>
+    <projectUrl>https://github.com/janssenr/PostcodeNlApiRestClient</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>PostcodeNlApi</description>
-    <tags></tags>
+    <description>PostcodeNlApiRestClient provides an API to directly talk with the Postcode.nl API through the REST endpoint offered into your .NET (web)applications.</description>
+    <tags>Postcode.nl, ASP.Net</tags>    
   </metadata>
 </package>
  
