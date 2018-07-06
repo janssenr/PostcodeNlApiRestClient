@@ -15,6 +15,10 @@
 </head>
 <body>
     <form id="form1" runat="server">
+        <h1>Postcode.nl API REST client example</h1>
+        <ul>
+            <li><a href="https://api.postcode.nl/documentation">Postcode.nl API documentation</a></li>
+        </ul>
         <fieldset>
             <legend>Authentication</legend>
             API url:<br />
@@ -25,166 +29,18 @@
             <asp:TextBox ID="txtSecret" runat="server"></asp:TextBox><br />
         </fieldset>
         <br />
-        <b>Select service:</b><br />
-        <asp:DropDownList ID="ddlService" runat="server">
-            <Items>
-                <asp:ListItem Value="Address" Text="Postcode.nl Address API: Address lookup"></asp:ListItem>
-                <asp:ListItem Value="Signal" Text="Postcode.nl Signal API: Check"></asp:ListItem>
-            </Items>
-        </asp:DropDownList>
-        <asp:Button ID="btnSelect" runat="server" Text="Select" OnClick="btnSelect_Click" />
+        <fieldset>
+            <legend>Input parameters</legend>
+            Postcode:<br />
+            <asp:TextBox ID="txtPostcode" runat="server"></asp:TextBox><br />
+            House number:<br />
+            <asp:TextBox ID="txtHouseNumber" runat="server"></asp:TextBox><br />
+            House number addition:<br />
+            <asp:TextBox ID="txtHouseNumberAddition" runat="server"></asp:TextBox><br />
+            <asp:CheckBox ID="chkValidateHouseNumberAddition" runat="server" Text="Strictly validate addition" /><br />
+        </fieldset>
         <br />
-        <asp:Panel ID="pnlAddress" runat="server" GroupingText="">
-            <fieldset>
-                <legend>Input parameters</legend>
-                Postcode:<br />
-                <asp:TextBox ID="txtPostcode" runat="server"></asp:TextBox><br />
-                House number:<br />
-                <asp:TextBox ID="txtHouseNumber" runat="server"></asp:TextBox><br />
-                House number addition:<br />
-                <asp:TextBox ID="txtHouseNumberAddition" runat="server"></asp:TextBox><br />
-                <asp:CheckBox ID="chkValidateHouseNumberAddition" runat="server" Text="Strictly validate addition" /><br />
-            </fieldset>
-            <br />
-            <asp:Button ID="btnAddressSend" runat="server" Text="Send" OnClick="btnAddressSend_Click" /><asp:CheckBox ID="chkAddressShowRawRequestResponse" runat="server" Text="Show raw HTTP request and response" /><br />
-        </asp:Panel>
-        <asp:Panel ID="pnlSignal" runat="server">
-            <fieldset>
-                <legend>Input parameters</legend>
-                <fieldset>
-                    <legend>Customer</legend>
-                    First name:<br />
-                    <asp:TextBox ID="txtCustomerFirstName" runat="server"></asp:TextBox><br />
-                    Last name:<br />
-                    <asp:TextBox ID="txtCustomerLastName" runat="server"></asp:TextBox><br />
-                    Birth date:<br />
-                    <asp:TextBox ID="txtCustomerBirthDate" runat="server"></asp:TextBox><br />
-                    Email:<br />
-                    <asp:TextBox ID="txtCustomerEmail" runat="server"></asp:TextBox><br />
-                    Email domain:<br />
-                    <asp:TextBox ID="txtCustomerEmailDomain" runat="server"></asp:TextBox><br />
-                    Phone number:<br />
-                    <asp:TextBox ID="txtCustomerPhoneNumber" runat="server"></asp:TextBox><br />
-                    Bank number:<br />
-                    <asp:TextBox ID="txtCustomerBankNumber" runat="server"></asp:TextBox><br />
-                    Site:<br />
-                    <asp:TextBox ID="txtCustomerSite" runat="server"></asp:TextBox><br />
-                    Internal ID:<br />
-                    <asp:TextBox ID="txtCustomerInternalId" runat="server"></asp:TextBox><br />
-                    <fieldset>
-                        <legend>Address</legend>
-                        Postcode:<br />
-                        <asp:TextBox ID="txtCustomerAddressPostcode" runat="server"></asp:TextBox><br />
-                        House number:<br />
-                        <asp:TextBox ID="txtCustomerAddressHouseNumber" runat="server"></asp:TextBox><br />
-                        House number addition:<br />
-                        <asp:TextBox ID="txtCustomerAddressHouseNumberAddition" runat="server"></asp:TextBox><br />
-                        Street:<br />
-                        <asp:TextBox ID="txtCustomerAddressStreet" runat="server"></asp:TextBox><br />
-                        City:<br />
-                        <asp:TextBox ID="txtCustomerAddressCity" runat="server"></asp:TextBox><br />
-                        Region:<br />
-                        <asp:TextBox ID="txtCustomerAddressRegion" runat="server"></asp:TextBox><br />
-                        Country:<br />
-                        <asp:DropDownList ID="ddlCustomerAddressCountry" runat="server">
-                            <Items>
-                                <asp:ListItem Value="" Text="- Unknown -"></asp:ListItem>
-                                <asp:ListItem Value="NL" Text="Netherlands"></asp:ListItem>
-                                <asp:ListItem Value="" Text="Not Netherlands"></asp:ListItem>
-                            </Items>
-                        </asp:DropDownList><br />
-                    </fieldset>
-                    <fieldset>
-                        <legend>Company</legend>
-                        Name:<br />
-                        <asp:TextBox ID="txtCustomerCompanyName" runat="server"></asp:TextBox><br />
-                        Government ID:<br />
-                        <asp:TextBox ID="txtCustomerCompanyGovernmentId" runat="server"></asp:TextBox><br />
-                        Country:<br />
-                        <asp:DropDownList ID="ddlCustomerCompanyCountry" runat="server">
-                            <Items>
-                                <asp:ListItem Value="" Text="- Unknown -"></asp:ListItem>
-                                <asp:ListItem Value="NL" Text="Netherlands"></asp:ListItem>
-                                <asp:ListItem Value="" Text="Not Netherlands"></asp:ListItem>
-                            </Items>
-                        </asp:DropDownList><br />
-                    </fieldset>
-                </fieldset>
-                <fieldset>
-                    <legend>Access</legend>
-                    IP address:<br />
-                    <asp:TextBox ID="txtAccessIpAddress" runat="server"></asp:TextBox><br />
-                    Additional IP addresses:<br />
-                    <asp:TextBox ID="txtAccessAdditionalUpAddresses" runat="server" TextMode="MultiLine"></asp:TextBox>(newline separated)<br />
-                    Session ID:<br />
-                    <asp:TextBox ID="txtAccessSessionId" runat="server"></asp:TextBox><br />
-                    Time:<br />
-                    <asp:TextBox ID="txtAccessTime" runat="server"></asp:TextBox><br />
-                    <fieldset>
-                        <legend>Browser</legend>
-                        User agent:<br />
-                        <asp:TextBox ID="txtAccessBrowserUserAgent" runat="server"></asp:TextBox><br />
-                        Accept language:<br />
-                        <asp:TextBox ID="txtAccessBrowserAcceptLanguage" runat="server"></asp:TextBox><br />
-                    </fieldset>
-                </fieldset>
-                <fieldset>
-                    <legend>Transaction</legend>
-                    Internal ID:<br />
-                    <asp:TextBox ID="txtTransactionInternalId" runat="server"></asp:TextBox><br />
-                    Status:<br />
-                    <asp:DropDownList ID="ddlTransactionStatus" runat="server">
-                        <Items>
-                            <asp:ListItem Value="" Text="- Not set -"></asp:ListItem>
-                        </Items>
-                    </asp:DropDownList><br />
-                    Cost:<br />
-                    <asp:TextBox ID="txtTransactionCost" runat="server"></asp:TextBox><br />
-                    Cost Currency:<br />
-                    <asp:TextBox ID="txtTransactionCostCurrency" runat="server"></asp:TextBox><br />
-                    Payment type:<br />
-                    <asp:TextBox ID="txtTransactionPaymentType" runat="server"></asp:TextBox><br />
-                    Weight:<br />
-                    <asp:TextBox ID="txtTransactionWeight" runat="server"></asp:TextBox><br />
-                    <fieldset>
-                        <legend>Delivery Address</legend>
-                        Postcode:<br />
-                        <asp:TextBox ID="txtTransactionDeliveryAddressPostcode" runat="server"></asp:TextBox><br />
-                        House number:<br />
-                        <asp:TextBox ID="txtTransactionDeliveryAddressHouseNumber" runat="server"></asp:TextBox><br />
-                        House number addition:<br />
-                        <asp:TextBox ID="txtTransactionDeliveryAddressHouseNumberAddition" runat="server"></asp:TextBox><br />
-                        Street:<br />
-                        <asp:TextBox ID="txtTransactionDeliveryAddressStreet" runat="server"></asp:TextBox><br />
-                        City:<br />
-                        <asp:TextBox ID="txtTransactionDeliveryAddressCity" runat="server"></asp:TextBox><br />
-                        Region:<br />
-                        <asp:TextBox ID="txtTransactionDeliveryAddressRegion" runat="server"></asp:TextBox><br />
-                        Country:<br />
-                        <asp:DropDownList ID="ddlTransactionDeliveryAddressCountry" runat="server">
-                            <Items>
-                                <asp:ListItem Value="" Text="- Unknown -"></asp:ListItem>
-                                <asp:ListItem Value="NL" Text="Netherlands"></asp:ListItem>
-                                <asp:ListItem Value="" Text="Not Netherlands"></asp:ListItem>
-                            </Items>
-                        </asp:DropDownList><br />
-                    </fieldset>
-                </fieldset>
-                <fieldset>
-                    <legend>Config</legend>
-                    Select Services:<br />
-                    <asp:TextBox ID="txtConfigSelectServices" runat="server" TextMode="MultiLine"></asp:TextBox>(newline separated)<br />
-                    Exclude Services:<br />
-                    <asp:TextBox ID="txtConfigExcludeServices" runat="server" TextMode="MultiLine"></asp:TextBox>(newline separated)<br />
-                    Select Result Types:<br />
-                    <asp:TextBox ID="txtConfigSelectTypes" runat="server" TextMode="MultiLine"></asp:TextBox>(newline separated)<br />
-                    Exclude Result Types:<br />
-                    <asp:TextBox ID="txtConfigExcludeTypes" runat="server" TextMode="MultiLine"></asp:TextBox>(newline separated)<br />
-                </fieldset>
-            </fieldset>
-            <br />
-            <asp:Button ID="btnSignalSend" runat="server" Text="Send" OnClick="btnSignalSend_Click" /><asp:CheckBox ID="chkSignalShowRawRequestResponse" runat="server" Text="Show raw HTTP request and response" /><br />
-        </asp:Panel>
+        <asp:Button ID="btnAddressSend" runat="server" Text="Send" OnClick="btnAddressSend_Click" />
         <asp:Panel ID="pnlResult" runat="server">
             <asp:Panel ID="pnlAddressResponse" runat="server">
                 <hr />
@@ -231,7 +87,7 @@
         <br />
         <hr />
         <br />
-        <h2>Example data:</h2>
+        <h2>Example address data:</h2>
         <h3>Existing postcode, with no housenumber addition</h3>
         <p>
             Postcode: `2012ES`<br />
@@ -240,9 +96,9 @@
         </p>
         <h3>Existing postcode, with only one possible housenumber addition</h3>
         <p>
-            Postcode: `2011DW`<br />
-            Housenumber: `8`<br />
-            Housenumber addition: `RD`<br />
+            Postcode: `1011AE`<br />
+            Housenumber: `36`<br />
+            Housenumber addition: `B`<br />
         </p>
         <h3>Existing postcode, with multiple housenumber additions, incorrect addition</h3>
         <p>
@@ -254,6 +110,12 @@
         <p>
             Postcode: `1234ZZ`<br />
             Housenumber: `1234`<br />
+            Housenumber addition: ``<br />
+        </p>
+        <h3>Result showing difference between street and streetNen</h3>
+        <p>
+            Postcode: `1011DG`<br />
+            Housenumber: `2`<br />
             Housenumber addition: ``<br />
         </p>
     </form>

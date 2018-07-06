@@ -12,6 +12,9 @@ namespace PostcodeNlApi.Address
         [DataMember(Name = "street")]
         public string Street { get; set; }
 
+        [DataMember(Name = "streetNen")]
+        public string StreetNen { get; set; }
+
         [DataMember(Name = "houseNumber")]
         public string HouseNumber { get; set; }
 
@@ -24,8 +27,14 @@ namespace PostcodeNlApi.Address
         [DataMember(Name = "city")]
         public string City { get; set; }
 
+        [DataMember(Name = "cityShort")]
+        public string CityShort { get; set; }
+
         [DataMember(Name = "municipality")]
         public string Municipality { get; set; }
+
+        [DataMember(Name = "municipalityShort")]
+        public string MunicipalityShort { get; set; }
 
         [DataMember(Name = "province")]
         public string Province { get; set; }

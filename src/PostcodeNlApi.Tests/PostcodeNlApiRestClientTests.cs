@@ -1,6 +1,5 @@
 ﻿using System.Configuration;
 using NUnit.Framework;
-using PostcodeNlApi.Signal;
 
 namespace PostcodeNlApi.Tests
 {
@@ -12,7 +11,8 @@ namespace PostcodeNlApi.Tests
         [SetUp]
         public void Init()
         {
-            _postcodeNlApiRestClient = new PostcodeNlApiRestClient(ConfigurationManager.AppSettings["appKey"], ConfigurationManager.AppSettings["appSecret"]);
+            _postcodeNlApiRestClient = new PostcodeNlApiRestClient(ConfigurationManager.AppSettings["appKey"],
+                ConfigurationManager.AppSettings["appSecret"]);
         }
 
         [Test]
@@ -25,10 +25,10 @@ namespace PostcodeNlApi.Tests
         }
 
         [Test]
-        [ExpectedException(typeof(PostcodeNlApiRestClientInputInvalidException))]
+        [ExpectedException(typeof(PostcodeNlApiRestClientAddressNotFoundException))]
         public void ExistingPostcodeWithOnlyOnePossibleHousenumberAddition()
         {
-            _postcodeNlApiRestClient.LookupAddress("2011DW", "8", "RD", true);
+            _postcodeNlApiRestClient.LookupAddress("1011AE", "36", "B", true);
         }
 
         [Test]
@@ -46,37 +46,12 @@ namespace PostcodeNlApi.Tests
         }
 
         [Test]
-        public void SignalTest()
+        public void ResultShowingDifferenceBetweenStreetAndStreetNen()
         {
-            var address = new PostcodeNlSignalAddress
-            {
-                Postcode = "2012ES",
-                HouseNumber = 30,
-                Country = "NL"
-            };
-
-            var request = new PostcodeNlSignalRequest
-            {
-                Customer = new PostcodeNlSignalCustomer
-                {
-                    Email = "test-address@postcode.nl",
-                    PhoneNumber = "+31235325689",
-                    Address = address
-                },
-                Access = new PostcodeNlSignalAccess
-                {
-                    IpAddress = "123.123.123.123"
-                },
-                Transaction = new PostcodeNlSignalTransaction
-                {
-                    Status = "new-checkout",
-                    InternalId = "534729",
-                    DeliveryAddress = address
-                }
-            };
-            var result = _postcodeNlApiRestClient.DoSignalCheck(request);
-            Assert.AreEqual(4, result.Signals.Count);
-            Assert.AreEqual(0, result.WarningCount);
+            var address = _postcodeNlApiRestClient.LookupAddress("1011DG", "2", "", true);
+            Assert.AreEqual("1011DG", address.Postcode);
+            Assert.AreEqual("2", address.HouseNumber);
+            Assert.AreEqual("", address.HouseNumberAddition);
         }
     }
 }

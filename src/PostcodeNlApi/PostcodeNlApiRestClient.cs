@@ -1,80 +1,102 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
 using PostcodeNlApi.Address;
 using PostcodeNlApi.Exceptions;
 using PostcodeNlApi.Helpers;
-using PostcodeNlApi.Signal;
 
 namespace PostcodeNlApi
-{ /** Common superclass for Exceptions raised by this class. */
+{
+    /// <summary>
+    /// Base superclass for Exceptions raised by this class.
+    /// </summary>
     public class PostcodeNlApiRestClientException : Exception
     {
         public PostcodeNlApiRestClientException(string message) : base(message) { }
     }
 
-    /** Exception raised when user input is invalid. */
+    /// <summary>
+    /// Exception raised when user input is invalid.
+    /// </summary>
     public class PostcodeNlApiRestClientInputInvalidException : PostcodeNlApiRestClientException
     {
         public PostcodeNlApiRestClientInputInvalidException(string message) : base(message) { }
     }
 
-    /** Exception raised when user input is valid, but no address could be found. */
+    /// <summary>
+    /// Exception raised when address input contains no formatting errors, but no address could be found.
+    /// </summary>
     public class PostcodeNlApiRestClientAddressNotFoundException : PostcodeNlApiRestClientException
     {
         public PostcodeNlApiRestClientAddressNotFoundException(string message) : base(message) { }
     }
 
-    /** Exception raised when an unexpected error occurred in this client. */
+    /// <summary>
+    /// Exception raised when an unexpected error occurred in this client.
+    /// </summary>
     public class PostcodeNlApiRestClientClientException : PostcodeNlApiRestClientException
     {
         public PostcodeNlApiRestClientClientException(string message) : base(message) { }
     }
 
-    /** Exception raised when an unexpected error occurred on the remote service. */
+    /// <summary>
+    /// Exception raised when an unexpected error occurred on the remote service.
+    /// </summary>
     public class PostcodeNlApiRestClientServiceException : PostcodeNlApiRestClientException
     {
         public PostcodeNlApiRestClientServiceException(string message) : base(message) { }
     }
 
-    /** Exception raised when there is a authentication problem.
-        In a production environment, you probably always want to catch, log and hide these exceptions.
-*/
+    /// <summary>
+    /// Exception raised when there is a authentication problem.
+    /// In a production environment, you probably always want to catch, log and hide these exceptions.
+    /// </summary>
     public class PostcodeNlApiRestClientAuthenticationException : PostcodeNlApiRestClientException
     {
         public PostcodeNlApiRestClientAuthenticationException(string message) : base(message) { }
     }
 
-    /**
-        Class to connect to the Postcode.nl API web service.
-
-
-        References:
-            <https://api.postcode.nl/>
-*/
+    /// <summary>
+    /// Class to connect to the Postcode.nl API web services via the REST endpoint.
+    /// </summary>
     public class PostcodeNlApiRestClient
     {
-        ///** (string) Version of the client */
-        //private const string VERSION = "1.0.0.0";
-        ///** (int) Maximum number of miliseconds allowed to set up the connection. */
-        //private const int CONNECTTIMEOUT = 3000;
-        ///** (int) Maximum number of seconds allowed to receive the response. */
-        //private const int TIMEOUT = 10;
-        /** (string) URL where the REST web service is located */
+        /// <summary>
+        /// Default URL where the REST web service is located
+        /// </summary>
         private readonly string _restApiUrl = "https://api.postcode.nl/rest";
-        /** (string) Internal storage of the application key of the authentication. */
+        /// <summary>
+        /// Internal storage of the application key of the authentication.
+        /// </summary>
         private readonly string _appKey;
-        /** (string) Internal storage of the application secret of the authentication. */
+        /// <summary>
+        /// Internal storage of the application secret of the authentication.
+        /// </summary>
         private readonly string _appSecret;
-        /** (boolean) If debug data is stored. */
-        private bool _debugEnabled;
-        /** (mixed) Debug data storage. */
-        private Dictionary<string, string> _debugData;
 
+        /// <summary>
+        /// If debug data is stored.
+        /// </summary>
+        private bool _debugEnabled;
+        /// <summary>
+        /// Debug data storage.
+        /// </summary>
+        private Dictionary<string, string> _debugData;
+        /// <summary>
+        /// Last response
+        /// </summary>
+        private string _lastResponseData;
+
+        /// <summary>
+        /// PostcodeNl_Api_RestClient constructor.
+        /// </summary>
+        /// <param name="appKey">Application Key as provided by Postcode.nl</param>
+        /// <param name="appSecret">Application Secret as provided by Postcode.nl</param>
+        /// <param name="restApiUrl">Service URL to call.</param>
         public PostcodeNlApiRestClient(string appKey, string appSecret, string restApiUrl = null)
         {
             _appKey = appKey;
@@ -86,12 +108,10 @@ namespace PostcodeNlApi
                 throw new PostcodeNlApiRestClientException("No application key / secret configured, you can obtain these at https://api.postcode.nl.");
         }
 
-        /**
-    Toggle debug option.
-
-    Parameters:
-    debugEnabled - (boolean) what to set the option to
-    */
+        /// <summary>
+        /// Toggle debug option.
+        /// </summary>
+        /// <param name="debugEnabled"></param>
         public void SetDebugEnabled(bool debugEnabled = true)
         {
             _debugEnabled = debugEnabled;
@@ -100,38 +120,26 @@ namespace PostcodeNlApi
         }
 
 
-        /**
-    Get the debug data gathered so far.
-
-    Returns:
-    (mixed) Debug data
-    */
+        /// <summary>
+        /// Get the debug data gathered so far.
+        /// </summary>
+        /// <returns></returns>
         public Dictionary<string, string> GetDebugData()
         {
             return _debugData;
         }
 
-        /**
-		Perform a REST call to the Postcode.nl API
-	*/
-        protected string DoRestCall(string method, string url, string data = null)
+        /// <summary>
+        /// Perform a REST call to the Postcode.nl API
+        /// </summary>
+        /// <param name="url"></param>
+        /// <returns></returns>
+        protected string DoRestCall(string url)
         {
             var req = WebRequest.Create(url);
             // How do we authenticate ourselves? Using HTTP BASIC authentication (http://en.wikipedia.org/wiki/Basic_access_authentication)
             req.Credentials = new NetworkCredential(_appKey, _appSecret);
-            req.Method = method;
-            if (method.ToUpper() != "GET" && data != null)
-            {
-                byte[] buffer = Encoding.UTF8.GetBytes(data);
-
-                req.ContentType = "application/json";
-                req.ContentLength = buffer.Length;
-
-                Stream stream = req.GetRequestStream();
-                stream.Write(buffer, 0, buffer.Length);
-                stream.Close();
-            }
-
+            req.Method = "GET";
             string responseHeaders = string.Empty;
             string responseValue = string.Empty;
             try
@@ -197,49 +205,26 @@ namespace PostcodeNlApi
             {
                 if (_debugEnabled)
                 {
-                    _debugData = new Dictionary<string, string> { { "request", req.Headers.ToString() } };
-                    if (method.ToUpper() != "GET" && data != null)
+                    _debugData = new Dictionary<string, string>
                     {
-                        _debugData["request"] = data;
-                    }
-                    _debugData.Add("response", responseHeaders + responseValue);
+                        {"request", req.Headers.ToString()},
+                        {"response", responseHeaders + responseValue}
+                    };
                 }
             }
+
+            _lastResponseData = responseValue;
             return responseValue;
         }
 
-        /**
-    Look up an address by postcode and house number.
-
-    Parameters:
-    postcode - (string) Dutch postcode in the '1234AB' format
-    houseNumber - (string) House number (may contain house number addition, will be separated automatically)
-    houseNumberAddition - (string) House number addition
-    validateHouseNumberAddition - (boolean) Strictly validate the addition
-
-    Returns:
-    (array) The address found
-    street - (string) Official name of the street.
-    houseNumber - (int) House number
-    houseNumberAddition - (string|null) House number addition if given and validated, null if addition is not valid / not found
-    postcode - (string) Postcode
-    city - (string) Official city name
-    municipality - (string) Official municipality name
-    province - (string) Official province name
-    rdX - (int) X coordinate of the Dutch Rijksdriehoeksmeting
-    rdY - (int) Y coordinate of the Dutch Rijksdriehoeksmeting
-    latitude - (float) Latitude of the address (front door of the premise)
-    longitude - (float) Longitude of the address
-    bagNumberDesignationId - (string) Official Dutch BAG id
-    bagAddressableObjectId - (string) Official Dutch BAG Address Object id
-    addressType - (string) Type of address, see reference link
-    purposes - (array) Array of strings, each indicating an official Dutch 'usage' category, see reference link
-    surfaceArea - (int) Surface area of object in square meters (all floors)
-    houseNumberAdditions - (array) All housenumber additions which are known for the housenumber given.
-
-    Reference:
-    <https://api.postcode.nl/Documentation/api>
-    */
+        /// <summary>
+        /// Look up an address by postcode and house number.
+        /// </summary>
+        /// <param name="postcode">Dutch postcode in the '1234AB' format</param>
+        /// <param name="houseNumber">House number (may contain house number addition, will be separated automatically)</param>
+        /// <param name="houseNumberAddition">House number addition</param>
+        /// <param name="validateHouseNumberAddition">Enable to validate the addition</param>
+        /// <returns>PostcodeNlAddress object</returns>
         public PostcodeNlAddress LookupAddress(string postcode, string houseNumber, string houseNumberAddition = "", bool validateHouseNumberAddition = false)
         {
             // Remove spaces in postcode ('1234 AB' should be '1234AB')
@@ -256,15 +241,15 @@ namespace PostcodeNlApi
             }
 
             // Test postcode format
-            //if (!IsValidPostcodeFormat(postcode))
-            //    throw new PostcodeNlApiRestClientInputInvalidException("Postcode '" + postcode + "' needs to be in the 1234AB format.");
-            //// Test housenumber format
-            //if (!houseNumber.All(char.IsDigit))
-            //    throw new PostcodeNlApiRestClientInputInvalidException("House number '" + houseNumber + "' must contain digits only.");
+            if (!IsValidPostcodeFormat(postcode))
+                throw new PostcodeNlApiRestClientInputInvalidException("Postcode '" + postcode + "' needs to be in the 1234AB format.");
+            // Test housenumber format
+            if (!houseNumber.All(char.IsDigit))
+                throw new PostcodeNlApiRestClientInputInvalidException("House number '" + houseNumber + "' must contain digits only.");
 
             // Create the REST url we want to retrieve. (making sure we escape any user input)
-            var url = _restApiUrl + "/addresses/" + HttpUtility.UrlEncode(postcode) + "/" + HttpUtility.UrlEncode(houseNumber) + "/" + HttpUtility.UrlEncode(houseNumberAddition);
-            string response = DoRestCall("GET", url);
+            var url = _restApiUrl + "/addresses/postcode/" + HttpUtility.UrlEncode(postcode) + "/" + HttpUtility.UrlEncode(houseNumber) + "/" + HttpUtility.UrlEncode(houseNumberAddition);
+            string response = DoRestCall(url);
 
             PostcodeNlAddress address;
             try
@@ -286,75 +271,24 @@ namespace PostcodeNlApi
             return address;
         }
 
-        /**
-		Perform a Postcode.nl Signal check on the given transaction and/or customer information.
-
-		Parameters:
-			customer - (array) Data concerning a customer
-			access - (array) Data concerning how a customer is accessing a service
-			transaction - (array) Data concerning a transaction of a customer
-			config - (array) Configuration for the signal check
-
-		Returns:
-			(array) signals
-				checkId - (string) Identifier of the check (22 characters)
-				signals - (array) All signals, each signal is an array, containing:
-					concerning - (string) Field this signal is about
-					type - (string) Name of signal type, including vendor, service name and response type
-					warning - (boolean) If this signal is significant.
-					message - (string) Human readable explanation for the signal
-					data - (array|null) Optional data of the signal. See documentation on website for data definitions of the specific signal types.
-				warningCount - (int) Number of warnings found in signals
-				reportPdfUrl - (string) URL to a report of the signal check
-
-		Reference:
-			<https://api.postcode.nl/documentation>
-	*/
-
-        public PostcodeNlSignalResponse DoSignalCheck(PostcodeNlSignalRequest signalRequest)
-        {
-            string url = _restApiUrl + "/signal/check";
-            string data = JsonHelper.Serialize(signalRequest);
-            string response = DoRestCall("POST", url, data);
-            PostcodeNlSignalResponse signalResponse;
-            try
-            {
-                signalResponse = JsonHelper.Deserialize<PostcodeNlSignalResponse>(response);
-            }
-            catch (Exception)
-            {
-                // We received a response, but we did not understand it...
-                throw new PostcodeNlApiRestClientClientException("Did not understand Postcode.nl API response: '" + response + "'.");
-            }
-            return signalResponse;
-        }
-
-        /**
-    Validate a postcode string for correct format.
-    (is 1234AB, or 1234ab - no space in between!)
-
-    Parameters:
-    postcode - (string) Postcode input
-
-    Returns
-    (boolean) if the postcode format is correct
-    */
+        /// <summary>
+        /// Validate if string has a correct Dutch postcode format.
+        /// Syntax: 1234AB, or 1234ab - no space in between.First digit cannot be a zero.
+        /// </summary>
+        /// <param name="postcode"></param>
+        /// <returns></returns>
         public bool IsValidPostcodeFormat(string postcode)
         {
-            return Regex.IsMatch(postcode, "[0-9]{4}[a-zA-Z]{2}");
+            return Regex.IsMatch(postcode, "[1-9][0-9]{3}[a-zA-Z]{2}");
         }
 
-        /**
-    Split a housenumber addition from a housenumber.
-    Examples: "123 2", "123 rood", "123a", "123a4", "123-a", "123 II"
-    (the official notation is to separate the housenumber and addition with a single space)
-
-    Parameters:
-    houseNumber - (string) Housenumber input
-
-    Returns
-    (array) split 'houseNumber' and 'houseNumberAddition'
-    */
+        /// <summary>
+        /// Split a housenumber addition from a housenumber.
+        /// Examples: "123 2", "123 rood", "123a", "123a4", "123-a", "123 II"
+        /// (the official notation is to separate the housenumber and addition with a single space)
+        /// </summary>
+        /// <param name="houseNumber"></param>
+        /// <returns>Array with houseNumber and houseNumberAddition values</returns>
         public string[] SplitHouseNumber(string houseNumber)
         {
             string houseNumberAddition = string.Empty;
@@ -369,6 +303,15 @@ namespace PostcodeNlApi
                         : string.Empty;
             }
             return new[] { houseNumber, houseNumberAddition };
+        }
+
+        /// <summary>
+        /// Return the last decoded JSON response received, can be used to get more information from exceptions, or debugging.
+        /// </summary>
+        /// <returns></returns>
+        public string GetLastResponseData()
+        {
+            return _lastResponseData;
         }
     }
 }
