@@ -7,14 +7,13 @@ public partial class _Default : System.Web.UI.Page
     protected void Page_Load(object sender, EventArgs e)
     {
         pnlResult.Visible = false;
-        pnlAddressResponse.Visible = false;
-        pnlSignalResponse.Visible = false;
         pnlError.Visible = false;
         pnlTimeTaken.Visible = false;
         pnlRawRequestResponse.Visible = false;
         if (!IsPostBack)
         {
-            txtApiUrl.Text = "https://api.postcode.nl/rest";
+            //txtApiUrl.Text = "https://api.postcode.nl/rest";
+            txtApiUrl.Text = "https://api.postcode.eu/nl/v1";
             txtKey.Text = WebConfigurationManager.AppSettings["appKey"];
             txtSecret.Text = WebConfigurationManager.AppSettings["appSecret"];
         }
@@ -38,7 +37,6 @@ public partial class _Default : System.Web.UI.Page
             lCity.Text = result.City;
             lResult.Text = result.ToString();
             pnlResult.Visible = true;
-            pnlAddressResponse.Visible = true;
         }
         catch (PostcodeNlApiRestClientClientException ex)
         {

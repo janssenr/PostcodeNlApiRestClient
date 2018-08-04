@@ -42,18 +42,9 @@
         <br />
         <asp:Button ID="btnAddressSend" runat="server" Text="Send" OnClick="btnAddressSend_Click" />
         <asp:Panel ID="pnlResult" runat="server">
-            <asp:Panel ID="pnlAddressResponse" runat="server">
-                <hr />
-                <h2>Validated address</h2>
-                <pre><asp:Literal ID="lStreet" runat="server"></asp:Literal>&nbsp;<asp:Literal ID="lHouseNumber" runat="server"></asp:Literal>&nbsp;<asp:Literal ID="lHouseNumberAddition" runat="server"></asp:Literal><br/><asp:Literal ID="lPostcode" runat="server"></asp:Literal>&nbsp;<asp:Literal ID="lCity" runat="server"></asp:Literal></pre>
-            </asp:Panel>
-            <asp:Panel ID="pnlSignalResponse" runat="server">
-                <hr />
-                <h2>Signal check response</h2>
-                <asp:Literal ID="lSignalCount" runat="server"></asp:Literal>
-                signal(s) reported:
-                <asp:HyperLink ID="hplReportPdfUrl" runat="server" Target="_blank">PDF report</asp:HyperLink><br />
-            </asp:Panel>
+            <hr />
+            <h2>Validated address</h2>
+            <pre><asp:Literal ID="lStreet" runat="server"></asp:Literal>&nbsp;<asp:Literal ID="lHouseNumber" runat="server"></asp:Literal>&nbsp;<asp:Literal ID="lHouseNumberAddition" runat="server"></asp:Literal><br/><asp:Literal ID="lPostcode" runat="server"></asp:Literal>&nbsp;<asp:Literal ID="lCity" runat="server"></asp:Literal></pre>
             <h3>Response data:</h3>
             <pre><asp:Literal ID="lResult" runat="server"></asp:Literal></pre>
         </asp:Panel>
