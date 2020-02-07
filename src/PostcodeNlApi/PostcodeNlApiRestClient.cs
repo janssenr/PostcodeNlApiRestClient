@@ -279,7 +279,7 @@ namespace PostcodeNlApi
         /// <returns></returns>
         public bool IsValidPostcodeFormat(string postcode)
         {
-            return Regex.IsMatch(postcode, "[1-9][0-9]{3}[a-zA-Z]{2}");
+            return Regex.IsMatch(postcode, "^[1-9][0-9]{3}[a-zA-Z]{2}$");
         }
 
         /// <summary>
