@@ -17,6 +17,7 @@ namespace PostcodeNlApi
     public class PostcodeNlApiRestClientException : Exception
     {
         public PostcodeNlApiRestClientException(string message) : base(message) { }
+        public PostcodeNlApiRestClientException(string message, Exception innerException) : base(message, innerException) { }
     }
 
     /// <summary>
@@ -165,40 +166,51 @@ namespace PostcodeNlApi
             catch (WebException ex)
             {
                 var response = (HttpWebResponse)ex.Response;
-                responseHeaders = response.Headers.ToString();
-                using (var responseStream = response.GetResponseStream())
+                if (response == null)
                 {
-                    if (responseStream != null)
-                    {
-                        using (var reader = new StreamReader(responseStream))
-                        {
-                            responseValue = reader.ReadToEnd();
-                            reader.Close();
-                        }
-                        responseStream.Close();
-                    }
+                    throw new PostcodeNlApiRestClientException(
+                        $"No response object, broken while doing the request: {ex.Message}",
+                        ex);
                 }
-                response.Close();
-                var exception = JsonHelper.Deserialize<PostcodeNlException>(responseValue);
-
-                switch (response.StatusCode)
+                else
                 {
-                    case HttpStatusCode.NotFound: //404
-                        // Could not find an address for the input values given
-                        if (exception.ExceptionId == "PostcodeNl_Service_PostcodeAddress_AddressNotFoundException")
-                            throw new PostcodeNlApiRestClientAddressNotFoundException(exception.Exception);
-                        break;
-                    case HttpStatusCode.Unauthorized: //401
-                    case HttpStatusCode.Forbidden: //403
-                        // Could not authenticate, probably invalid or no key/secret configured
-                        throw new PostcodeNlApiRestClientAuthenticationException(exception.Exception);
-                    case HttpStatusCode.BadRequest: //400
-                        throw new PostcodeNlApiRestClientInputInvalidException(exception.Exception);
-                    case HttpStatusCode.InternalServerError: //500
-                        throw new PostcodeNlApiRestClientServiceException(exception.Exception);
-                    default:
-                        // Other error
-                        throw new PostcodeNlApiRestClientServiceException(exception.Exception);
+                    responseHeaders = response.Headers.ToString();
+                    using (var responseStream = response.GetResponseStream())
+                    {
+                        if (responseStream != null)
+                        {
+                            using (var reader = new StreamReader(responseStream))
+                            {
+                                responseValue = reader.ReadToEnd();
+                                reader.Close();
+                            }
+
+                            responseStream.Close();
+                        }
+                    }
+
+                    response.Close();
+                    var exception = JsonHelper.Deserialize<PostcodeNlException>(responseValue);
+
+                    switch (response.StatusCode)
+                    {
+                        case HttpStatusCode.NotFound: //404
+                            // Could not find an address for the input values given
+                            if (exception.ExceptionId == "PostcodeNl_Service_PostcodeAddress_AddressNotFoundException")
+                                throw new PostcodeNlApiRestClientAddressNotFoundException(exception.Exception);
+                            break;
+                        case HttpStatusCode.Unauthorized: //401
+                        case HttpStatusCode.Forbidden: //403
+                            // Could not authenticate, probably invalid or no key/secret configured
+                            throw new PostcodeNlApiRestClientAuthenticationException(exception.Exception);
+                        case HttpStatusCode.BadRequest: //400
+                            throw new PostcodeNlApiRestClientInputInvalidException(exception.Exception);
+                        case HttpStatusCode.InternalServerError: //500
+                            throw new PostcodeNlApiRestClientServiceException(exception.Exception);
+                        default:
+                            // Other error
+                            throw new PostcodeNlApiRestClientServiceException(exception.Exception);
+                    }
                 }
             }
             finally
