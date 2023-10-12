@@ -69,7 +69,7 @@ namespace PostcodeNlApi
         /// <summary>
         /// Default URL where the REST web service is located
         /// </summary>
-        private readonly string _restApiUrl = "https://api.postcode.nl/rest";
+        private readonly string _restApiUrl = "https://api.postcode.eu/nl/v1";
         /// <summary>
         /// Internal storage of the application key of the authentication.
         /// </summary>
@@ -106,7 +106,7 @@ namespace PostcodeNlApi
                 _restApiUrl = restApiUrl;
 
             if (string.IsNullOrEmpty(_appKey) || string.IsNullOrEmpty(_appSecret))
-                throw new PostcodeNlApiRestClientException("No application key / secret configured, you can obtain these at https://api.postcode.nl.");
+                throw new PostcodeNlApiRestClientException("No application key / secret configured, you can obtain these at https://account.postcode.eu");
         }
 
         /// <summary>

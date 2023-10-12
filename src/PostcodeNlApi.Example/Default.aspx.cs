@@ -12,7 +12,6 @@ public partial class _Default : System.Web.UI.Page
         pnlRawRequestResponse.Visible = false;
         if (!IsPostBack)
         {
-            //txtApiUrl.Text = "https://api.postcode.nl/rest";
             txtApiUrl.Text = "https://api.postcode.eu/nl/v1";
             txtKey.Text = WebConfigurationManager.AppSettings["appKey"];
             txtSecret.Text = WebConfigurationManager.AppSettings["appSecret"];
