@@ -17,7 +17,7 @@
     <form id="form1" runat="server">
         <h1>Postcode.nl API REST client example</h1>
         <ul>
-            <li><a href="https://developer.postcode.eu/documentation">Postcode.nl API documentation</a></li>
+            <li><a href="https://api.postcode.nl/documentation">Postcode.nl API documentation</a></li>
         </ul>
         <fieldset>
             <legend>Authentication</legend>

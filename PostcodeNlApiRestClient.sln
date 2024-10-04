@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.23107.0
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.35229.62
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PostcodeNlApi", "src\PostcodeNlApi\PostcodeNlApi.csproj", "{C69FDF78-468E-411F-B47B-0541639A13CB}"
 EndProject
@@ -9,7 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PostcodeNlApi.Tests", "src\
 EndProject
 Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "PostcodeNlApiRestClient.Example", "src\PostcodeNlApi.Example\", "{D24C31DF-C595-4416-80BA-807355EB43FC}"
 	ProjectSection(WebsiteProperties) = preProject
-		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.5.1"
+		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.8"
 		ProjectReferences = "{c69fdf78-468e-411f-b47b-0541639a13cb}|PostcodeNlApi.dll;"
 		Debug.AspNetCompiler.VirtualPath = "/localhost_20950"
 		Debug.AspNetCompiler.PhysicalPath = "src\PostcodeNlApi.Example\"
@@ -72,5 +72,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {87922A18-1688-43E4-ACFE-FE0C5C5573C4}
 	EndGlobalSection
 EndGlobal
