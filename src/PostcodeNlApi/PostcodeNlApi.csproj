@@ -6,7 +6,7 @@
 		<TargetFramework>net48</TargetFramework>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<PackageId>PostcodeNlApi</PackageId>
-		<Version>1.0.5</Version>
+		<Version>1.1.0</Version>
 		<Authors>Rob Janssen</Authors>
 		<Company />
 		<Description>PostcodeNlApi provides an API to directly talk with the Postcode.nl API through the REST endpoint offered into your .NET (web)applications.</Description>
@@ -15,7 +15,8 @@
 		<PackageProjectUrl>https://github.com/janssenr/PostcodeNlApiRestClient</PackageProjectUrl>
 		<PackageIcon>touch-icon.png</PackageIcon>
 		<PackageTags>Postcode.nl, ASP.Net rest data</PackageTags>
-		<PackageReleaseNotes>GetServicePoint feature</PackageReleaseNotes>
+		<PackageReleaseNotes>Use HttpClient instead of WebRequest
+Implement Validate function</PackageReleaseNotes>
 	</PropertyGroup>
 	<ItemGroup Condition="'$(TargetFramework)' == 'net48'">
 		<Reference Include="System.Net.Http" />
