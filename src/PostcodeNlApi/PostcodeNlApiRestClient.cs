@@ -3,12 +3,15 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Web;
 using PostcodeNlApi.Address;
 using PostcodeNlApi.Exceptions;
 using PostcodeNlApi.Helpers;
+using PostcodeNlApi.Models.Validate;
 
 namespace PostcodeNlApi
 {
@@ -135,85 +138,64 @@ namespace PostcodeNlApi
         /// </summary>
         /// <param name="url"></param>
         /// <returns></returns>
-        protected string DoRestCall(string url)
+        protected async Task<string> DoRestCallAsync(string url)
         {
-            var req = WebRequest.Create(url);
-            // How do we authenticate ourselves? Using HTTP BASIC authentication (http://en.wikipedia.org/wiki/Basic_access_authentication)
-            req.Credentials = new NetworkCredential(_appKey, _appSecret);
-            //req.Headers.Add("Authorization", $"Basic {Convert.ToBase64String(Encoding.UTF8.GetBytes(_appKey + ":" + _appSecret))}");
-            req.Method = "GET";
             string responseHeaders = string.Empty;
             string responseValue = string.Empty;
-            HttpStatusCode reponseStatusCode = HttpStatusCode.OK;
-            try
-            {
-                using (var response = (HttpWebResponse)req.GetResponse())
-                {
-                    responseHeaders = response.Headers.ToString();
-                    using (var responseStream = response.GetResponseStream())
-                    {
-                        if (responseStream != null)
-                        {
-                            using (var reader = new StreamReader(responseStream))
-                            {
-                                responseValue = reader.ReadToEnd();
-                                reader.Close();
-                            }
-                            responseStream.Close();
-                        }
-                    }
-                    response.Close();
-                }
-            }
-            catch (WebException ex)
-            {
-                var response = (HttpWebResponse)ex.Response;
-                responseHeaders = response.Headers.ToString();
-                reponseStatusCode = response.StatusCode;
-                using (var responseStream = response.GetResponseStream())
-                {
-                    if (responseStream != null)
-                    {
-                        using (var reader = new StreamReader(responseStream))
-                        {
-                            responseValue = reader.ReadToEnd();
-                            reader.Close();
-                        }
-                        responseStream.Close();
-                    }
-                }
-                response.Close();
-                var exception = JsonHelper.Deserialize<PostcodeNlException>(responseValue);
+            HttpStatusCode responseStatusCode = HttpStatusCode.OK;
 
-                switch (reponseStatusCode)
-                {
-                    case HttpStatusCode.NotFound: //404
-                        // Could not find an address for the input values given
-                        if (exception.ExceptionId == "PostcodeNl_Service_PostcodeAddress_AddressNotFoundException")
-                            throw new PostcodeNlApiRestClientAddressNotFoundException(exception.Exception);
-                        break;
-                    case HttpStatusCode.Unauthorized: //401
-                    case HttpStatusCode.Forbidden: //403
-                        // Could not authenticate, probably invalid or no key/secret configured
-                        throw new PostcodeNlApiRestClientAuthenticationException(exception.Exception);
-                    case HttpStatusCode.BadRequest: //400
-                        throw new PostcodeNlApiRestClientInputInvalidException(exception.Exception);
-                    case HttpStatusCode.InternalServerError: //500
-                        throw new PostcodeNlApiRestClientServiceException(exception.Exception);
-                    default:
-                        // Other error
-                        throw new PostcodeNlApiRestClientServiceException(exception.Exception);
-                }
-            }
-            finally
+            using (var client = new HttpClient())
             {
-                if (_debugEnabled)
+                // Set up basic authentication headers
+                var byteArray = Encoding.UTF8.GetBytes($"{_appKey}:{_appSecret}");
+                client.DefaultRequestHeaders.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
+
+                try
                 {
-                    _debugData = new Dictionary<string, string>
+                    // Make the GET request
+                    var response = await client.GetAsync(url).ConfigureAwait(false);
+                    responseHeaders = response.Headers.ToString();
+                    responseStatusCode = response.StatusCode;
+
+                    responseValue = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+
+                    if (!response.IsSuccessStatusCode)
                     {
-                        {"request", req.Headers.ToString()},
-                        {"response", responseHeaders + responseValue}
-                    };
+                        var exception = JsonHelper.Deserialize<PostcodeNlException>(responseValue);
+                        switch (responseStatusCode)
+                        {
+                            case HttpStatusCode.NotFound: // 404
+                                if (exception.ExceptionId == "PostcodeNl_Service_PostcodeAddress_AddressNotFoundException")
+                                    throw new PostcodeNlApiRestClientAddressNotFoundException(exception.Exception);
+                                break;
+                            case HttpStatusCode.Unauthorized: // 401
+                            case HttpStatusCode.Forbidden: // 403
+                                throw new PostcodeNlApiRestClientAuthenticationException(exception.Exception);
+                            case HttpStatusCode.BadRequest: // 400
+                                throw new PostcodeNlApiRestClientInputInvalidException(exception.Exception);
+                            case HttpStatusCode.InternalServerError: // 500
+                                throw new PostcodeNlApiRestClientServiceException(exception.Exception);
+                            default:
+                                throw new PostcodeNlApiRestClientServiceException(exception.Exception);
+                        }
+                    }
+                }
+                catch (HttpRequestException ex)
+                {
+                    // Handle request-related exceptions
+                    throw new Exception($"Request error: {ex.Message}");
+                }
+                finally
+                {
+                    if (_debugEnabled)
+                    {
+                        _debugData = new Dictionary<string, string>
+                        {
+                            {"request", client.DefaultRequestHeaders.ToString()},
+                            {"response", responseHeaders + responseValue}
+                        };
+                    }
                 }
             }
 
@@ -229,7 +211,7 @@ namespace PostcodeNlApi
         /// <param name="houseNumberAddition">House number addition</param>
         /// <param name="validateHouseNumberAddition">Enable to validate the addition</param>
         /// <returns>PostcodeNlAddress object</returns>
-        public PostcodeNlAddress LookupAddress(string postcode, string houseNumber, string houseNumberAddition = "", bool validateHouseNumberAddition = false)
+        public async Task<Address.Address> LookupAddress(string postcode, string houseNumber, string houseNumberAddition = "", bool validateHouseNumberAddition = false)
         {
             // Remove spaces in postcode ('1234 AB' should be '1234AB')
             postcode = postcode != null ? postcode.Trim().Replace(" ", "") : string.Empty;
@@ -253,12 +235,12 @@ namespace PostcodeNlApi
 
             // Create the REST url we want to retrieve. (making sure we escape any user input)
             var url = _restApiUrl + "/addresses/postcode/" + HttpUtility.UrlEncode(postcode) + "/" + HttpUtility.UrlEncode(houseNumber) + "/" + HttpUtility.UrlEncode(houseNumberAddition);
-            string response = DoRestCall(url);
+            string response = await DoRestCallAsync(url);
 
-            PostcodeNlAddress address;
+            Address.Address address;
             try
             {
-                address = JsonHelper.Deserialize<PostcodeNlAddress>(response);
+                address = JsonHelper.Deserialize<Address.Address>(response);
             }
             catch (Exception)
             {
@@ -296,7 +278,7 @@ namespace PostcodeNlApi
         public string[] SplitHouseNumber(string houseNumber)
         {
             string houseNumberAddition = string.Empty;
-            Match match = Regex.Match(houseNumber, "(?<number>[0-9]+)(?:[^0-9a-zA-Z]+(?<addition1>[0-9a-zA-Z ]+)|(?<addition2>[a-zA-Z](?:[0-9a-zA-Z ]*)))?");
+            System.Text.RegularExpressions.Match match = Regex.Match(houseNumber, "(?<number>[0-9]+)(?:[^0-9a-zA-Z]+(?<addition1>[0-9a-zA-Z ]+)|(?<addition2>[a-zA-Z](?:[0-9a-zA-Z ]*)))?");
             if (match.Success)
             {
                 houseNumber = match.Groups["number"].Value;
@@ -317,5 +299,57 @@ namespace PostcodeNlApi
         {
             return _lastResponseData;
         }
+
+        public async Task<ValidateResponse> Validate(string country, string postcode = null, string locality = null, string street = null, string building = null, string region = null, string streetAndBuilding = null)
+        {
+            var parameters = new Dictionary<string, string>();
+            if (!string.IsNullOrWhiteSpace(postcode))
+                parameters.Add("postcode", postcode);
+            if (!string.IsNullOrWhiteSpace(locality))
+                parameters.Add("locality", locality);
+            if (!string.IsNullOrWhiteSpace(street))
+                parameters.Add("street", street);
+            if (!string.IsNullOrWhiteSpace(building))
+                parameters.Add("building", building);
+            if (!string.IsNullOrWhiteSpace(region))
+                parameters.Add("region", region);
+            if (!string.IsNullOrWhiteSpace(streetAndBuilding))
+                parameters.Add("streetAndBuilding", streetAndBuilding);
+
+            var url = GetUrl("https://api.postcode.eu/international/v1/validate/" + HttpUtility.UrlEncode(country), parameters);
+            string response = await DoRestCallAsync(url.ToString());
+
+            ValidateResponse validateReponse;
+            try
+            {
+                validateReponse = JsonHelper.Deserialize<ValidateResponse>(response);
+            }
+            catch (Exception)
+            {
+                // We received a response, but we did not understand it...
+                throw new PostcodeNlApiRestClientClientException("Did not understand Postcode.nl API response: '" + response + "'.");
+            }
+
+            return validateReponse;
+        }
+
+        private Uri GetUrl(string url, Dictionary<string, string> parameters = null)
+        {
+            if (parameters != null && parameters.Any())
+            {
+                var queryParameters = string.Join("&",
+                    parameters.Select(
+                        p =>
+                            string.IsNullOrEmpty(p.Value)
+                                ? Uri.EscapeDataString(p.Key)
+                                : $"{Uri.EscapeDataString(p.Key)}={Uri.EscapeDataString(p.Value)}"));
+                if (!string.IsNullOrWhiteSpace(queryParameters))
+                {
+                    url += "?" + queryParameters;
+                }
+            }
+            return new Uri(url);
+        }
+
     }
 }
